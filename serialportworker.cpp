@@ -87,8 +87,8 @@ void SerialPortWorker::write(const QByteArray& writeData)
 {
     m_writeData = writeData;
 
-    const qint64 bytesWritten = m_serialPort->write(writeData.constData(),
-                                                    writeData.size());
+    const qint64 bytesWritten = m_serialPort->write(m_writeData.constData(),
+                                                    m_writeData.size());
 
     if (bytesWritten == -1) {
         m_standardOutput << QObject::tr(
