@@ -55,6 +55,10 @@ void SerialPortWorker::handleReadyRead()
             "Data successfully received from port %1")
             .arg(m_serialPort->portName())
                          << endl;
+        m_readData = bitsToBytes(bitsDeStuffing(
+                                     bytesToBits(
+                                         m_readData)));
+        m_readData.remove(0, 1);
         emit dataReady();
     }
 }
@@ -87,6 +91,37 @@ void SerialPortWorker::write(const QByteArray& writeData)
 {
     m_writeData = writeData;
 
+    QBitArray bitData = bytesToBits(m_writeData);
+
+#ifdef QT_DEBUG
+
+    std::cout << "===============Source===============" << std::endl
+              << "Source data:" << std::endl;
+    log_bit_array(bitData);
+    std::cout << "Source Byte data: " << m_writeData.constData() << std::endl
+              << "Combination count: " << combinationCount(bitData) << std::endl
+              << "====================================" << std::endl <<
+        std::endl;
+#endif // ifdef QT_DEBUG
+
+    QBitArray bitDataStuff(bitsStuffing(bitData));
+
+#ifdef QT_DEBUG
+
+    std::cout << "===============Result===============" << std::endl
+              << "Result data:" << std::endl;
+    log_bit_array(bitDataStuff);
+    std::cout << "Result Bytes data: "
+              << bitsToBytes(bitDataStuff).constData() << std::endl
+              << "Combination count: " << combinationCount(bitDataStuff)
+              << std::endl
+              << "====================================" << std::endl <<
+        std::endl;
+#endif // ifdef QT_DEBUG
+
+    m_writeData = bitsToBytes(bitDataStuff);
+    m_writeData.prepend('~');
+
     const qint64 bytesWritten = m_serialPort->write(m_writeData.constData(),
                                                     m_writeData.size());
 
@@ -110,3 +145,120 @@ bool SerialPortWorker::changeBaudrate(const qint32& value)
     if (m_serialPort) return m_serialPort->setBaudRate(value);
     return false;
 }
+
+QByteArray SerialPortWorker::bitsToBytes(const QBitArray& bits) {
+    QByteArray bytes;
+
+    int bytesSize = bits.count() / 8;
+
+    bytesSize += (bits.count() % 8 ? 1 : 0);
+    bytes.resize(bytesSize);
+    bytes.fill(0);
+
+    // Convert from QBitArray to QByteArray
+    for (int b = 0; b < bits.count(); ++b)
+        bytes[b / 8] = (
+            bytes.at(b / 8) |
+            ((bits[b] ? 1 : 0) << (7 - (b % 8)))
+            );
+    return bytes;
+}
+
+QBitArray SerialPortWorker::bytesToBits(const QByteArray& bytes)
+{
+    QBitArray bits;
+
+    bits.resize(bytes.count() * 8);
+    bits.fill(false);
+
+    // Convert from QByteArray to QBitArray
+    for (int i = 0; i < bytes.count(); ++i) {
+        for (int b = 0; b < 8; b++) {
+            bits.setBit(i * 8 + b, bytes.at(i) & (1 << (7 - b)));
+        }
+    }
+    return bits;
+}
+
+int SerialPortWorker::combinationCount(const QBitArray& bits)
+{
+    int combination_count = 0;
+    int one_count         = 0;
+
+    for (int i = 0; i < bits.size(); ++i)
+    {
+        bits.testBit(i) ? ++one_count : one_count = 0;
+
+        if (one_count == 5)
+        {
+            one_count = 0;
+            ++combination_count;
+        }
+    }
+
+    return combination_count;
+}
+
+QBitArray SerialPortWorker::bitsStuffing(const QBitArray& bits)
+{
+    int combination_count = combinationCount(bits);
+    QBitArray bitsStuff(bits.count() + combination_count,
+                        false);
+    int one_count = 0;
+
+    for (int i = 0, j = 0; i < bits.size(); ++i, ++j)
+    {
+        bits.testBit(i) ? ++one_count : one_count = 0;
+
+        bitsStuff.setBit(j,
+                         bits.testBit(i));
+
+        if (one_count == 5)
+        {
+            one_count = 0;
+            ++j;
+        }
+    }
+
+    return bitsStuff;
+}
+
+QBitArray SerialPortWorker::bitsDeStuffing(const QBitArray& bits)
+{
+    QBitArray bitsDeStuff(bits.count(),
+                          false);
+
+    int one_count = 0;
+
+    for (int i = 0, j = 0; i < bits.size(); ++i, ++j)
+    {
+        bits.testBit(i) ? ++one_count : one_count = 0;
+
+        bitsDeStuff.setBit(j,
+                           bits.testBit(i));
+
+        if ((one_count == 5) &&
+            (i + 1 < bits.count()) &&
+            !bits.testBit(i + 1))
+        {
+            one_count = 0;
+            ++i;
+        }
+    }
+
+    return bitsDeStuff;
+}
+
+#ifdef QT_DEBUG
+void SerialPortWorker::log_bit_array(QBitArray bits)
+{
+    for (int i = 0; i < bits.size(); ++i)
+    {
+        std::cout << (bits.testBit(i) ? '1' : '0');
+
+        if ((i + 1) % 8 == 0) std::cout << ' ';
+    }
+    std::cout << std::endl;
+}
+
+#endif // ifdef QT_DEBUG

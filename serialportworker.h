@@ -6,6 +6,8 @@
 #include <QCoreApplication>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QBitArray>
+#include <QDataStream>
 
 #include <iostream>
 
@@ -39,6 +41,15 @@ private:
     QByteArray m_writeData;
     qint64 m_bytesWritten = 0;
     QTextStream m_standardOutput;
+
+    QByteArray bitsToBytes(const QBitArray& bits);
+    QBitArray  bytesToBits(const QByteArray& bytes);
+    int        combinationCount(const QBitArray& bits);
+    QBitArray  bitsStuffing(const QBitArray& bits);
+    QBitArray  bitsDeStuffing(const QBitArray& bits);
+#ifdef QT_DEBUG
+    void       log_bit_array(QBitArray bits);
+#endif // ifdef QT_DEBUG
 };
 
 #endif // SERIALPORTWORKER_H
