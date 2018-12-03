@@ -1,6 +1,6 @@
-# Laba_2  
+# Laba_3
 ## Задание  
-Бит-стаффинг/де-стаффинг  
+CRC-код  
 
 -------
-[<-- Прошлая лаба](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_1) 
+[<-- Прошлая лаба](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_2) 
