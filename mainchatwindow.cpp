@@ -18,6 +18,8 @@ MainChatWindow::~MainChatWindow()
 
 void MainChatWindow::initSerialPort()
 {
+    qDebug() << sizeof(QChar);
+
     auto serialPort = new QSerialPort;
 
     serialPort->setPortName("COM1");
@@ -27,12 +29,10 @@ void MainChatWindow::initSerialPort()
     serialPort->setStopBits(QSerialPort::OneStop);
     serialPort->setDataBits(QSerialPort::Data8);
 
-    if (!serialPort->open(QIODevice::ReadWrite))
-    {
-        std::cout << QObject::tr("Failed to open port %1 for R/W, error: %2")
+    if (!serialPort->open(QIODevice::ReadWrite)) {
+        qDebug() << QObject::tr("Failed to open port %1 for R/W, error: %2")
             .arg(serialPort->portName())
-            .arg(serialPort->errorString()).toStdString()
-                  << std::endl;
+            .arg(serialPort->errorString());
     }
 
     m_serialPortWorker = new SerialPortWorker(serialPort);
@@ -41,35 +41,33 @@ void MainChatWindow::initSerialPort()
             this,
             SLOT(handleDataReady()));
 
-    ui->statusBar->showMessage("Baudrate: " +
-                               QString::number(serialPort->baudRate()));
+    ui->statusBar->showMessage("Baudrate: "
+                               +QString::number(serialPort->baudRate()));
 }
 
 void MainChatWindow::connectSignals()
 {
-    connect(ui->sendButton,
-            SIGNAL(clicked()),
-            this,
-            SLOT(handlerSendButton()));
-    connect(ui->inputField,
-            SIGNAL(returnPressed()),
-            ui->sendButton,
-            SIGNAL(clicked()));
+    connect(ui->sendButton, SIGNAL(clicked()),
+            this, SLOT(handlerSendButton()));
+    connect(ui->inputField, SIGNAL(returnPressed()),
+            ui->sendButton, SIGNAL(clicked()));
+    connect(ui->checkBox, &QCheckBox::stateChanged,
+            m_serialPortWorker, &SerialPortWorker::handleCrashBit);
 }
 
 void MainChatWindow::initMain()
 {
+    initSerialPort();
     createActions();
     connectSignals();
-    initSerialPort();
 }
 
 void MainChatWindow::createActions()
 {
-    connect(ui->mBaudrateAction, SIGNAL(triggered()), this,
-            SLOT(handleMenuBaudRate()));
-    connect(ui->mDisplayClear, SIGNAL(triggered()), ui->textDisplay,
-            SLOT(clear()));
+    connect(ui->mBaudrateAction, &QAction::triggered,
+            this, &MainChatWindow::handleMenuBaudRate);
+    connect(ui->mDisplayClear, &QAction::triggered,
+            ui->textDisplay, &QTextBrowser::clear);
 }
 
 void MainChatWindow::handlerSendButton()
@@ -101,7 +99,6 @@ void MainChatWindow::handleMenuBaudRate()
 
 void MainChatWindow::handlerDialogDataReady(qint32 data)
 {
-    if ((data > 0) &&
-        m_serialPortWorker->changeBaudrate(data)) ui->statusBar->showMessage("Baudrate: " + QString::number(
-                                                                                 data));
+    if (data > 0 && m_serialPortWorker->changeBaudrate(data))
+        ui->statusBar->showMessage("Baudrate: " + QString::number(data));
 }

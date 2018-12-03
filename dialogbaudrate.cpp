@@ -29,10 +29,10 @@ void DialogBaudrate::handleComboboxChoice(QString value)
 
 void DialogBaudrate::handleButtonboxClicked(QAbstractButton *button)
 {
-    if ((reinterpret_cast<QPushButton *>(button) ==
-         ui->buttonBox->button(QDialogButtonBox::Ok)) ||
-        (reinterpret_cast<QPushButton *>(button) ==
-         ui->buttonBox->button(QDialogButtonBox::Apply))) emit dataReady(
+    if ((reinterpret_cast<QPushButton *>(button)
+         == ui->buttonBox->button(QDialogButtonBox::Ok))
+        || (reinterpret_cast<QPushButton *>(button)
+            == ui->buttonBox->button(QDialogButtonBox::Apply))) emit dataReady(
             ui->spinBox->value());
     emit dataReady(0);
 }

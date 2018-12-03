@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QDialogButtonBox>
+#include <QDebug>
+
 #include "serialportworker.h"
 #include "dialogbaudrate.h"
 
@@ -12,7 +14,8 @@ namespace Ui {
 class MainChatWindow;
 }
 
-class MainChatWindow : public QMainWindow {
+class MainChatWindow : public QMainWindow
+{
     Q_OBJECT
 
 public:
