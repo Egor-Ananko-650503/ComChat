@@ -3,4 +3,5 @@
 Бит-стаффинг/де-стаффинг  
 
 -------
-[<-- Прошлая лаба](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_1) 
+[<-- Прошлая лаба](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_1) | 
+[Следующая лаба -->](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_3) 
