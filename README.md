@@ -1,6 +1,6 @@
-# Laba_3
+# Laba_4
 ## Задание  
-CRC-код  
+CSMA/CD (Коллизии)  
 
 -------
-[<-- Прошлая лаба](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_2) 
+[<-- Прошлая лаба](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_3) 
