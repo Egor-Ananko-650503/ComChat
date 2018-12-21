@@ -40,6 +40,7 @@ private slots:
     void handleDataReady();
     void handleMenuBaudRate();
     void handlerDialogDataReady(qint32 data);
+    void handleCollision(int state);
 };
 
 #endif // MAINCHATWINDOW_H

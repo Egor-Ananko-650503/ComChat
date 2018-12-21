@@ -26,6 +26,8 @@ public:
 
     QByteArray m_readData;
     bool crashBitFlag = false;
+    bool hasCollision = false;
+    bool isSolvedCollision = false;
 
 signals:
 
@@ -34,6 +36,8 @@ signals:
 public slots:
 
     void handleCrashBit(int state);
+    void handleCollision(int state);
+    void handleIsSolvedCollision(int state);
 
 private slots:
 

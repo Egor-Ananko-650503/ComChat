@@ -49,6 +49,13 @@ void SerialPortWorker::handleReadyRead()
             "Data successfully received from port %1")
             .arg(m_serialPort->portName())
                          << endl;
+
+        if (m_readData == "???") {
+            QMessageBox::critical(nullptr, "Reading error.",
+                                  "Collision was found.");
+            return;
+        }
+
         char crc = crc8(m_readData);
         if (crc == 0) {
             m_readData.remove(m_readData.length() - 1, 1);
@@ -58,7 +65,7 @@ void SerialPortWorker::handleReadyRead()
                                              m_readData)));
             emit dataReady();
         } else {
-            QMessageBox::critical(nullptr, "Sending error.",
+            QMessageBox::critical(nullptr, "Reading error.",
                                   "CRC has detected an error. CRC result - "
                                   + QString::number(crc));
         }
@@ -96,9 +103,26 @@ void SerialPortWorker::handleCrashBit(int state)
     if (state == Qt::Unchecked) crashBitFlag = false;
 }
 
+void SerialPortWorker::handleCollision(int state)
+{
+    qDebug() << this << "Collision " << (state == Qt::Checked);
+    hasCollision = state == Qt::Checked;
+}
+
+void SerialPortWorker::handleIsSolvedCollision(int state)
+{
+    qDebug() << this << "IsSolved collision " << (state == Qt::Checked);
+    isSolvedCollision = state == Qt::Checked;
+}
+
 void SerialPortWorker::write(const QByteArray &writeData)
 {
     m_writeData = writeData;
+
+    if (hasCollision) {
+        m_serialPort->write("???");
+        return;
+    }
 
     char crc = crc8(m_writeData);
     QByteArray testData(m_writeData + crc);
@@ -139,8 +163,11 @@ void SerialPortWorker::write(const QByteArray &writeData)
     m_writeData.append(crc8(m_writeData));
 
     if (crashBitFlag) {
-        char crashedByte = m_writeData[2] & 0xEF;
-        m_writeData[2] = crashedByte;
+        m_writeData[2] = static_cast<char>(
+            (m_writeData[2] & 0x10)
+            ? m_writeData[2] & 0xEF
+            : m_writeData[2] | 0x10
+            );
     }
 
     const qint64 bytesWritten = m_serialPort->write(m_writeData.constData(),
@@ -266,14 +293,14 @@ QBitArray SerialPortWorker::bitsDeStuffing(const QBitArray &bits)
 
 char SerialPortWorker::crc8(const QByteArray &bytes)
 {
-    char crc = 0xFF;
+    char crc = static_cast<char>(0xFF);
 
     for (char ch
          : bytes) {
         crc ^= ch;
 
         for (int i = 0; i < 8; ++i)
-            crc = crc & 0x80 ? (crc << 1) ^ 0x31 : crc << 1;
+            crc = static_cast<char>((crc & 0x80) ? (crc << 1) ^ 0x31 : crc << 1);
     }
 
     return crc;

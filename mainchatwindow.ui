@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>500</height>
+    <height>550</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>550</height>
+   </size>
   </property>
   <property name="font">
    <font>
@@ -33,19 +39,40 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QCheckBox" name="checkBox">
-          <property name="text">
-           <string>CrashBit (*-*)</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QLineEdit" name="inputField"/>
         </item>
         <item>
          <widget class="QPushButton" name="sendButton">
           <property name="text">
            <string>Send</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QCheckBox" name="crashBit">
+          <property name="text">
+           <string>CrashBit (*-*)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="collision">
+          <property name="text">
+           <string>Do Collision (-_-)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="isSolvedCollision">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Solved collision</string>
           </property>
          </widget>
         </item>

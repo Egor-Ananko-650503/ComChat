@@ -18,8 +18,6 @@ MainChatWindow::~MainChatWindow()
 
 void MainChatWindow::initSerialPort()
 {
-    qDebug() << sizeof(QChar);
-
     auto serialPort = new QSerialPort;
 
     serialPort->setPortName("COM1");
@@ -51,8 +49,12 @@ void MainChatWindow::connectSignals()
             this, SLOT(handlerSendButton()));
     connect(ui->inputField, SIGNAL(returnPressed()),
             ui->sendButton, SIGNAL(clicked()));
-    connect(ui->checkBox, &QCheckBox::stateChanged,
+    connect(ui->crashBit, &QCheckBox::stateChanged,
             m_serialPortWorker, &SerialPortWorker::handleCrashBit);
+    connect(ui->collision, &QCheckBox::stateChanged,
+            m_serialPortWorker, &SerialPortWorker::handleCollision);
+    connect(ui->collision, &QCheckBox::stateChanged,
+            this, &MainChatWindow::handleCollision);
 }
 
 void MainChatWindow::initMain()
@@ -101,4 +103,9 @@ void MainChatWindow::handlerDialogDataReady(qint32 data)
 {
     if (data > 0 && m_serialPortWorker->changeBaudrate(data))
         ui->statusBar->showMessage("Baudrate: " + QString::number(data));
+}
+
+void MainChatWindow::handleCollision(int state)
+{
+    ui->isSolvedCollision->setEnabled(state == Qt::Checked);
 }
