@@ -3,4 +3,5 @@
 CSMA/CD (Коллизии)  
 
 -------
-[<-- Прошлая лаба](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_3) 
+[<-- Прошлая лаба](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_3) | 
+[Следующая лаба -->](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_5) 
