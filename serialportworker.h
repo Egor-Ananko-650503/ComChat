@@ -9,6 +9,9 @@
 #include <QBitArray>
 #include <QDataStream>
 #include <QDebug>
+#include <QRandomGenerator>
+#include <QThread>
+#include <QtConcurrent/QtConcurrentRun>
 
 #include <iostream>
 
@@ -28,6 +31,9 @@ public:
     bool crashBitFlag = false;
     bool hasCollision = false;
     bool isSolvedCollision = false;
+    bool wasCollision = false;
+
+    const int attemptMax = 5;
 
 signals:
 

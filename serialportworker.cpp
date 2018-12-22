@@ -51,8 +51,15 @@ void SerialPortWorker::handleReadyRead()
                          << endl;
 
         if (m_readData == "???") {
-            QMessageBox::critical(nullptr, "Reading error.",
-                                  "Collision was found.");
+            if (!wasCollision) {
+                wasCollision = true;
+                QMessageBox::critical(nullptr, "Reading error.",
+                                      "Collision was found.");
+            }
+            return;
+        }
+        if (m_readData == "???#") {
+            wasCollision = false;
             return;
         }
 
@@ -120,8 +127,27 @@ void SerialPortWorker::write(const QByteArray &writeData)
     m_writeData = writeData;
 
     if (hasCollision) {
-        m_serialPort->write("???");
-        return;
+        int collisionSuccessfullAttempt = QRandomGenerator::global()->bounded(1,
+                                                                              attemptMax);
+        int attemptCount = 0;
+        while (attemptCount < attemptMax)
+        {
+            m_serialPort->write("???" + 0);
+            m_serialPort->waitForBytesWritten();
+            ++attemptCount;
+            auto value = QRandomGenerator::global()->
+                         bounded(0, pow(2, qMax(attemptCount, 10)) + 1);
+            qDebug() << value;
+            QThread::msleep(value);
+            if (isSolvedCollision && collisionSuccessfullAttempt == attemptCount) break;
+        }
+        m_serialPort->write("???#" + 0);
+        if (!isSolvedCollision) {
+            QMessageBox::critical(nullptr, "Sending error.",
+                                  "Unresolved collision.");
+            return;
+        }
+        m_serialPort->waitForBytesWritten();
     }
 
     char crc = crc8(m_writeData);

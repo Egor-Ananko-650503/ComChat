@@ -53,6 +53,8 @@ void MainChatWindow::connectSignals()
             m_serialPortWorker, &SerialPortWorker::handleCrashBit);
     connect(ui->collision, &QCheckBox::stateChanged,
             m_serialPortWorker, &SerialPortWorker::handleCollision);
+    connect(ui->isSolvedCollision, &QCheckBox::stateChanged,
+            m_serialPortWorker, &SerialPortWorker::handleIsSolvedCollision);
     connect(ui->collision, &QCheckBox::stateChanged,
             this, &MainChatWindow::handleCollision);
 }
@@ -76,9 +78,13 @@ void MainChatWindow::handlerSendButton()
 {
     if (ui->inputField->text().isEmpty()) return;
 
-    ui->textDisplay->append("-> " + ui->inputField->text());
     QByteArray arr(ui->inputField->text().toUtf8());
     m_serialPortWorker->write(arr);
+    bool collisionChecked = ui->collision->checkState() == Qt::Checked;
+    bool isSolvedCollisionChecked = ui->isSolvedCollision->checkState() == Qt::Checked;
+    if (!collisionChecked
+        || (collisionChecked && isSolvedCollisionChecked))
+        ui->textDisplay->append("-> " + ui->inputField->text());
     ui->inputField->clear();
 }
 
