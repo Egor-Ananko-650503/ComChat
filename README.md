@@ -1,7 +1,6 @@
-# Laba_3
+# Laba_5
 ## Задание  
-CRC-код  
+Token Ring  
 
 -------
-[<-- Прошлая лаба](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_2) | 
-[Следующая лаба -->](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_4) 
+[<-- Прошлая лаба](https://github.com/Egor-Ananko-650503/ComChat/tree/Laba_4) 
